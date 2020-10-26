@@ -1,0 +1,11 @@
+# Wine Data Variable Descriptions 
+ <!-- html table generated in R 3.6.3 by xtable 1.8-4 package -->
+<!-- Mon Oct 26 16:23:04 2020 -->
+<table border=1>
+<tr> <th>  </th> <th> Variable </th> <th> Description </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td> FixedAcidity </td> <td> Various combined acids present in g/L </td> </tr>
+  <tr> <td align="right"> 2 </td> <td> CitricAcid </td> <td> Amount of Citric Acid present in g/L </td> </tr>
+  <tr> <td align="right"> 3 </td> <td> ResidualSugar </td> <td> Natural grape sugars after fermentation in g/L </td> </tr>
+  <tr> <td align="right"> 4 </td> <td> AlcoholContent </td> <td> Alcoholic content in mL per 100 mL of solution </td> </tr>
+  <tr> <td align="right"> 5 </td> <td> Quality </td> <td> Ranking of taste quality on a scale of 1 - 10 </td> </tr>
+   </table>
