@@ -1,0 +1,1022 @@
+---
+title: 'Bioinformatic Tutorial Chapter 9: Tables'
+subtitle: 'By Bryanna Bright and Sabrina Schuler'
+date: "`r Sys.Date()`"
+authors: "Bryanna Bright and Sabrina Schuler"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+link-citations: yes
+fontsize: 12pt
+bibliography: [Bibliography_Reproducible_Science_Ch_9.bib, packages_chapter_9.bib]
+csl: AmJBot.csl
+---
+
+```{r packages, echo=FALSE, warning=FALSE, include=FALSE}
+library(knitr)
+library(rmarkdown)
+library(bookdown)
+library(knitcitations)
+library(formatR)
+library(devtools)
+library(dplyr)
+library(kableExtra)
+library(xtable)
+library(texreg)
+library(DT)
+
+#Generate BibTex citation file for all R packages used to produce report
+knitr::write_bib(.packages(), file = 'packages_chapter_9.bib')
+
+```
+
+
+# Aim
+
+The aim of this tutorial is to provide students with the expertise to generate reproducible tables using *xtable* [@JSSv055i08; @gandrud2015reproducible], *texreg*[@leifeld_2020; @gandrud2015reproducible], *DT*[@collins_2019], and allied R packages (see [Appendix 1] for a full list). There are many different ways to create and customize tables in R, both for HTML and PDF documents. 
+In this tutorial, we will cover procedures to create basic HTML syntax for simple tables, learn to develop interactive tables, and lastly, briefly demonstrate how to create this within the LaTex environment to generate PDFs.
+
+$~$
+
+# Learning Outcomes
+
+This tutorial is devoted to to chapter 9 and provides students with the opportunities to learn procedures to:
+
+**Day 1**  
+
+- Generate basic tables within R Markdown (HTML) format
+  + Basic HTML syntax
+  + Using the "kable" function
+  + Using the package "xtable"
+  + Using the package "texreg"
+  
+**Day 2**  
+
+- Create tables in R for LaTex PDFs
+  + Basic LaTeX syntax
+  + Using the package "xtable"
+  + Using the package "texreg"
+- Produce customizable tables using the R package "kableExtra"
+- Produce interactive tables using R package "DT"
+
+$~$
+
+# Associated files supporting this tutorial
+
+A set of files are provided to support teaching of material presented in this chapter. These files are deposited in the shared Google Drive at this path: 
+
+  + `Reproducible_Science/Chapters/Chapter_9/Tutorial_files`
+
+Files are as follows:
+
+- `Ch_9_Tutorial_Tables.Rmd`: This is the `.Rmd` file used to compile the instructional HTML document. 
+- `Bibliography_Reproducible_Science_Ch_9.bib`: This file contains references cited in `BibTex` format.
+- `AmJBot.csl`: This citation style language (CSL) file allows formatting citations and bibliography following citation style of *American Journal of Botany*.
+- `PlantGrowth1.csv`: This is the `.csv` file containing the dataset of `PlantGrowth1` that is used for the beginning exercises and examples.
+- `wine.csv`: This is the `.csv` file containing the dataset of `wine` that is used for the middle exercises and examples.
+- `WineVariableDescrip.doc`: This is `.doc` file containing the variable names and their descriptions. This will be generated later in the tutorial.
+
+$~$
+
+# R packages
+
+To execute this tutorial, the following R packages have to be installed on your computer using code provided below:
+
+```{r pck, eval=FALSE, tidy=TRUE}
+install.packages(c("xtable", "texreg", "DT"))
+```
+
+$~$
+
+Then, make sure that the following R packages are loaded in your system: 
+
+```{r library, eval=FALSE}
+library(knitr)
+library(rmarkdown)
+library(bookdown)
+library(knitcitations)
+library(formatR)
+library(devtools)
+library(dplyr)
+```
+
+$~$
+
+# Day 1
+
+## Generate Basic Tables in R Markdown
+
+Connecting statistical results to graphics helps aid in reproducibility, and makes data more presentable to readers by introducing visuals. Tables are useful for describing parameter estimates, descriptive statistics, and displaying research findings in general [@gandrud2015reproducible]. This section will demonstrate how to create tables from various R objects by using different functions and packages for Markdown / HTML documents. 
+
+For this part of the tutorial, you will need the following packages loaded from your library:
+
+```{r lbr1, echo=TRUE, warning=FALSE, include=TRUE}
+library(xtable)
+library(texreg)
+library(knitr)
+```
+
+$~$
+
+### Plant Growth dataset
+
+The dataset that we will be using for the first exercises is `PlantGrowth1.csv`. The data is organized in the following manner:
+
+1. *ID*: individual plant ID
+2. *Type of Treatment*: treatment that each plant was assigned
+    + Control
+    + Treatment 1
+    + Treatment 2
+3. *Weight of shoot biomass*: total gram weight of each individual plant after treatment has been applied
+
+
+```{r plantstr, echo=FALSE, fig.cap="Snapshot of the data structure for the PlantGrowth1 dataset associated to the first half of chapter 9.", out.width = "25%", fig.align='center', dpi=50}
+knitr::include_graphics("Figures/PlantGrowth1_structure.png")
+```
+
+$~$
+
+### Markdown Tables
+
+First, we are going to look at how to simply generate a table in Markdown, which can be tedious to create by hand. However, there is no need to declare new environments, but rather just being typing content into columns and rows.
+
+As previously referenced, we will be using the `PlantGrowth1` data for the remainder of this tutorial. You do not need to download the `PlantGrowth1.csv` file yet for this portion since we are creating this table from scratch. However, later, we will load this file. 
+
+Let's start by making a table of the **CTRL**: columns are delimited with a vertical bar **(|)**, rows by entering a new line, and dashes to separate headers from data **(---)**. To justify text, use colons **(:)** on the dashed rows. For this code, the alignment will be left-center-center. *Note: make sure there are the same number of vertical bars and dashes*
+
+```
+ID | GROUP | WEIGHT
+:--- | :---: | :---:
+1 | CTRL | 4.17
+2 | CTRL | 5.58
+3 | CTRL | 5.18
+4 | CTRL | 6.11
+5 | CTRL | 4.5
+6 | CTRL | 4.61
+7 | CTRL | 5.17
+8 | CTRL | 4.53
+9 | CTRL | 5.33
+10| CTRL | 5.14
+**Table 1.** Simple markdown table of plant growth biomass in grams after having different treatments applied 
+```
+$~$
+
+**Table 1.** Simple markdown table of plant growth biomass in grams after having different treatments applied 
+
+ID | GROUP | WEIGHT
+:--- | :---: | :---:
+1 | CTRL | 4.17
+2 | CTRL | 5.58
+3 | CTRL | 5.18
+4 | CTRL | 6.11
+5 | CTRL | 4.5
+6 | CTRL | 4.61
+7 | CTRL | 5.17
+8 | CTRL | 4.53
+9 | CTRL | 5.33
+10| CTRL | 5.14
+
+$~$
+
+### HTML Tables
+
+Now that we have gone through the syntax a little, we are going to learn how to create HTML tables, which can be a process as well, and very time-consuming. HTML tables use **"tags"** by encompassing **"<"** and **">"** to begin and end tables. To begin a table, use **`<table>`**. To end a table, insert a forward slash **(/)**. 
+
+Within the table, we need to specify rows **`<tr>`** and individual cells **`<td>`**. We can further specify table rows that separate body from head by using the tags **`<thead>`** and **`<tbody>`**. Again, all these same tags can be applied when closing portions by using the forward slash **(/)**. 
+
+Let's produce this using the **CTRL** data again, but only with the first 4 rows. Prior to creating the table, you can input a certain **`<style>`** for your table, as presented in this example:
+
+```
+<style>
+td, th {
+  border: 1px solid #dddddd;
+}
+</style>
+
+<table>
+  <caption>**Table 2.** Plant Growth Data</caption>
+  <thead>
+    <tr>
+      <th>ID</th> <th>Group</th> <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td> <td>CTRL</td> <td>4.17</td>
+    </tr>
+    <tr>
+      <td>2</td> <td>CTRL</td> <td>5.58</td>
+    </tr>
+    <tr>
+      <td>3</td> <td>CTRL</td> <td>5.18</td>
+    </tr>
+    <tr>
+      <td>4</td> <td>CTRL</td> <td>6.11</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+$~$
+
+<style>
+td, th {
+  border: 1px solid #dddddd;
+}
+</style>
+
+<table>
+  <caption>**Table 2.** Plant Growth Data</caption>
+  <thead>
+    <tr>
+      <th>ID</th> <th>Group</th> <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td> <td>CTRL</td> <td>4.17</td>
+    </tr>
+    <tr>
+      <td>2</td> <td>CTRL</td> <td>5.58</td>
+    </tr>
+    <tr>
+      <td>3</td> <td>CTRL</td> <td>5.18</td>
+    </tr>
+    <tr>
+      <td>4</td> <td>CTRL</td> <td>6.11</td>
+    </tr>
+  </tbody>
+</table>
+
+$~$
+
+Overall, this table is more time-consuming to create, and can be customizable at the cost of more code writing and time. There are many more styles to explore to make the table look more beautified, but we have shown limited use of this tool here. More info can be acquired here: https://www.w3schools.com/tags/default.asp
+
+$~$
+
+## *kable* function in Markdown
+
+The `kable` function is part of the `knitr` package that generates very simple tables strictly from rectangular data, such as data frames and matrices. These tables are not format-friendly, but we will dive into more interactive tables later in this tutorial. You can create a data frame from scratch or you can import a `.csv` file. We will import the `PlantGrowth1.csv` data for this part, as demonstrated from Chapter 6.
+
+```{r kable, results='asis'}
+
+#Use the kable function and create a dataframe of the variables and associated data. which will produce the simple kable table
+kable_plant <- data.frame(
+ID = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
+Group = c("CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL"),
+Weight = c("4.17", "5.58", "5.18", "6.11", "4.5", "4.61", "5.17", "4.53", "5.33", "5.14")
+)
+
+#Add a caption
+kable(kable_plant, caption = "**Table 3.** Example kable Table with Plant Growth Data")
+```
+
+$~$
+
+```{r kable2, eval = FALSE}
+##Import a .csv file data frame instead of writing all your work out
+kable_plant2 <- read.csv("PlantGrowth1.csv")
+
+kable(kable_plant2, caption = "**Table 3.** Example kable Table with All Plant Growth Data")
+##If you would like to see this entire table generated, write "eval=TRUE" above. This table is 30 variables long, so it was not generated to save space.
+```
+
+$~$
+
+### Wine dataset
+
+The dataset that we will be using for the rest of the exercises for the first day is `wine`. This is a randomly created dataset that will need to be loaded into your file pathway. The data is organized in the following manner: 
+
+1. *FixedAcidity*: various combined acids found in wine in g/L
+2. *CitricAcid*: amount of citric acid present in g/L
+3. *ResidualSugar*: natural grape sugars after fermentation in g/L
+4. *AlcoholContent*: mL of pure alcohol per 100 mL of solution content
+5. *Quality*: ranking of taste quality on a scale of 1 - 10
+
+
+```{r winestr, echo=FALSE, fig.cap="Full data structure for the wine dataset associated with Part 1 of Chapter 9.", out.width = "50%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/wine_structure.png")
+```
+
+$~$
+
+## *xtable* package for HTML format
+
+The package `xtable` can generate tables from a larger variety of R objects, including statistical model objects. For this exercise, we will use linear models, `lm`, to create model summaries. This exercise requires importing the R-installed dataset mentioned earlier called `wine`, which has more variables to derive out linear model from.
+
+First, let's create the model to be summarized and then create the table:
+
+```{r model, results='asis'}
+#Call the .csv file into the environment
+wine <- read.csv("wine.csv")
+
+##Create the simple linear regression model
+M1 <- lm(Quality ~ FixedAcidity, data = wine)
+```
+```{r summary, echo=FALSE, eval=FALSE}
+##This function shows the class type of the data and verifies your model
+class(M1)
+
+##Now, produce a summary of the statistics
+summary(M1)
+```
+```{r xtabl, results='asis'}
+##Create an xtable object from M1
+M1table <- xtable(M1, caption ="**Table 4.** Linear Regression of Quality of Wine Based on Fixed Acidity",
+                  label = "Basic Xtable Summary of Wine Data",
+                  digits = 2)
+
+##Produce the xtable by using the print function and specify type "html"
+print.xtable(M1table, type = "html", caption.placement = "bottom")
+```
+
+$~$
+
+## Creating variable description documents with *xtable*
+
+Often times, it is useful to have a table describing the variables within your dataset and putting them into a Markdown document, which can aid in reproducibility. Most of our data has been stored as plain-text files, and do not include descriptions, so we will create them in this exercise. 
+
+First, we will create an `xtable` object for the descriptions, and then use the function `cat` to create the Markdown variable description file. Again, we will be using the `wine` dataset for this exercise.
+
+```{r descrip, results='hide'}
+#Create variable vector from column names
+Variable <- names(wine)
+#Create variable description vector
+Description <- c("Various combined acids present in g/L", "Amount of Citric Acid present in g/L", "Natural grape sugars after fermentation in g/L", "Alcoholic content in mL per 100 mL of solution", "Ranking of taste quality on a scale of 1 - 10"
+)
+
+#Combine Variable and Description variables into a matrix
+DescriptionsBound <- cbind(Variable, Description)
+#Create an xtable from the matrix
+Winedescription <- xtable(DescriptionsBound)
+#Now, we need to format for HTML style
+WineVariables <- print.xtable(Winedescription, type = "html")
+
+#Use "cat" function to make the file
+cat("# Wine Data Variable Descriptions \n",
+    WineVariables,
+    file = "WineVariableDescrip.doc"
+)
+```
+
+For the file type, you can choose various forms of the table output, but for this tutorial, we generated a Word Document by place `.doc` at the end of the file name. This file should be available to you as a Word Document in your folder pathway where the rest of this tutorial is available.
+
+
+$~$
+
+## *texreg* package for HTML format
+
+The previous tools investigated, `kable` function and `xtable` package, are limited in their capabilities. What if our data is more complicated and includes multiple matrices or data frames, or have a variety of R objects we want to transform into readable tables? This is where the `texreg` package comes in handy! This package presents estimates from multiple statistical models in styles that prominent academic journals tend to use. In this exercise, we will work with this package to produce more fitting tables, continuing to use the `wine` data frame. To do this, we need to first create more linear models.
+
+
+```{r texreg, results='asis'}
+##Create more linear models
+M2 <- lm(Quality ~ FixedAcidity + CitricAcid, data = wine)
+M3 <- lm(Quality ~ FixedAcidity + CitricAcid + ResidualSugar, data = wine)
+M4 <- lm(Quality ~ FixedAcidity + CitricAcid + ResidualSugar + AlcoholContent, data = wine)
+
+##Generate custom coefficients to include in the table
+wine_names <- c('(Intercept)', 'Fixed Acidity (g/L)', 'Citric Acid (g/L)', 'Residual Sugars (g/L)', 'Alcohol Content')
+
+##Use "htmlreg" function  to generate table
+htmlreg(list(M1, M2, M3, M4),
+caption = '**Table 5.** Nested Estimates Table for Wine Quality Data as HTML Document',
+caption.above = TRUE,
+custom.coef.names = wine_names)
+
+```
+
+Congrats! You have completed Part 1 of generating basic tables! Now you should be able to create tables in various ways. Part 2 will investigate thoroughly into creating more interactive tables that will captivate your audience, as well as make it simpler to navigate through rows and rows of data.
+
+$~$
+
+$~$
+
+# Day 2
+
+## Generating tables in LaTeX
+
+Welcome to Day 2 of this tutorial! In this section, we are going to generate the exact same tables that we had done in the previous day in R Markdown, but in LaTex syntax and format instead. You will need all of the downloaded materials from the first day, and the LaTex program in order to complete this section.
+
+$~$
+
+### Basic LaTeX syntax
+
+First, we are going to look at how to simply generate a table in LaTex, which can be tedious to create by hand. There are two environments to consider for tables in LaTex: the `table` and the `tabular`. The `table` environment allows one to format the location of the table and its caption while the `tabular` environment allows one to format the contents of the table.
+
+The `table` environment is part of the markup where special commands can be executed, something as simple as `center` which now types everything into the center.
+
+```
+\begin{center}
+This is a center environment.
+\end{center}
+
+```
+The `tabular` environment is used for creating tables in LaTex, so let's work through some basic syntax.
+
+Working with the previous `PlantGrowth1` data, we are going to create a `tabular` environment. A simple environment begins with specifying the environment **{tabular}** and its arguments that specify number of columns and their locations **{TABLE_SPEC}**. Placing a **(|)** separates columns in the arguments section For the `tabular` environment, this looks like this:
+
+```
+\begin{tabular}{l | c c}
+
+```
+
+Now, we can create content. Let's input some of the **CTRL** data from the `PlantGrowth1` file. 
+
+```
+\begin{tabular}{l | c c}
+  \hline
+  ID & GROUP & WEIGHT \\
+  1 & CTRL & 4.17 \\
+  2 & CTRL & 5.58
+  3 & CTRL & 5.18
+  4 & CTRL & 6.11
+  5 & CTRL & 4.5
+  6 & CTRL & 4.61
+  7 & CTRL & 5.17
+  8 & CTRL & 4.53
+  9 & CTRL & 5.33
+  10 & CTRL & 5.14
+  \hline
+\end{tabular}
+
+```
+As you can see, we delimited the individual columns by using ampersands **(&)**, and to create new lines, we used two backslashes **(\\)**. Adding another row with **(hline)** creates horizontal lines within the `tabular` environment.
+
+The following table is produced:
+
+```{r latex plant, echo=FALSE, out.width = "50%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/Plant_latex.png")
+```
+
+
+Our table is lacking a caption and is very plain, and how do we fix that? We can use the `table float` environment to adjust our output. As you may have noticed, this is a `table` environment we will be generating, so the following is a reflection of what we have already done, but now using the `table` environment to encapsulate the entirety of the output. Likewise to the **{TABLE_SPEC}** argument, we will use **{POSITION_SPEC}** to determine the location of the table, using functions **'h'** for here, **'t'** for top, and **'b'** for bottom of the page. The **'caption'** command can also be used within the `table` environment. Let's do a whole example:
+
+```
+\begin{table}[t]
+  \caption{**Table 1.*** Example Simple LaTeX Table with Plant Growth Data}
+  \label{ExLaTeXTable}
+  \begin{center}
+    \begin{tabular}{l | c c}
+      \hline
+      ID & GROUP & WEIGHT \\
+      1 & CTRL & 4.17 \\
+      2 & CTRL & 5.58
+      3 & CTRL & 5.18
+      4 & CTRL & 6.11
+      5 & CTRL & 4.5
+      6 & CTRL & 4.61
+      7 & CTRL & 5.17
+      8 & CTRL & 4.53
+      9 & CTRL & 5.33
+      10 & CTRL & 5.14
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+```
+This creates the following output:
+
+```{r latex plant2, echo=FALSE, out.width = "150%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/Plant_latex2.png")
+```
+
+$~$
+
+### *kable* function in LaTex
+
+Likewise to Markdown, the `kable` function is part of the `knitr` package that generates very simple tables strictly from rectangular data, such as data frames and matrices. The same format for using the `kable` function can be applied in LaTex. We will use the `PlantGrowth1` **CTRL** dataset for this output:
+
+```{r kabTex, results='asis'}
+
+#Use the kable function and create a dataframe of the variables and associated data. which will produce the simple kable table
+kable_plant <- data.frame(
+ID = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
+Group = c("CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL", "CTRL"),
+Weight = c("4.17", "5.58", "5.18", "6.11", "4.5", "4.61", "5.17", "4.53", "5.33", "5.14")
+)
+
+#Add a caption
+kable(kable_plant, caption = "**Table 2.** Example kable Table with Plant Growth Data")
+```
+
+$~$
+
+```{r kabTex2, eval = FALSE}
+##Import a .csv file data frame instead of writing all your work out
+kable_plant2 <- read.csv("PlantGrowth1.csv")
+
+kable(kable_plant2, caption = "**Table 2.** Example kable Table with All Plant Growth Data")
+##If you would like to see this entire table generated, write "eval=TRUE" in the code chunk options. This table is 30 variables long, so it was not generated to save space.
+```
+
+$~$
+
+### `xtable` package
+
+As mentioned previously, the package `xtable` can generate tables from a larger variety of R objects, including statistical model objects. The same concepts apply for LaTex formatting as they did in Markdown, so let's run through the code again, using the `wine` dataset described earlier.
+
+```{r modelLaTex, results='asis'}
+#Make sure that xtable is called from the library
+library(xtable)
+
+#Call the .csv file into the environment
+wine <- read.csv("wine.csv")
+
+##Create the simple linear regression model
+L1 <- lm(Quality ~ FixedAcidity, data = wine)
+```
+```{r summaryLaTex, eval=FALSE, echo=FALSE}
+##This function shows the class type of the data and verifies your model
+class(L1)
+
+##Now, produce a summary of the statistics
+summary(L1)
+```
+```{r xtablLaTex, results='asis', eval = FALSE}
+##Create a LaTex table from M1 and show output markup
+xtable(L1, caption ="**Table 3.** Linear Regression of Quality of Wine Based on Fixed Acidity",
+                  label = "Basic Xtable Summary of Wine Data",
+                  digits = 3)
+```
+
+Here is an example of what the output table could look like when knitted to pdf. 
+```{r xtablat, echo=FALSE, out.width = "50%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/xtable_Latex.png")
+```
+
+
+$~$
+
+### `texreg` package
+
+For LaTex, the `texreg` package works the same way as it did in the HTML format, and so this package is primarily used to show the estimates from a number of nested regression models. We will use the `wine` data to investigate this further, but the same concept applies. Instead of using the function `htmlreg`, we will simply replace that wordage with `texreg` to make the `xtable`.
+
+
+```{r LaTexreg, results='asis'}
+##Create more linear models
+L2 <- lm(Quality ~ FixedAcidity + CitricAcid, data = wine)
+L3 <- lm(Quality ~ FixedAcidity + CitricAcid + ResidualSugar, data = wine)
+L4 <- lm(Quality ~ FixedAcidity + CitricAcid + ResidualSugar + AlcoholContent, data = wine)
+
+##Generate custom coefficients to include in the table
+wine_names1 <- c('(Intercept)', 'Fixed Acidity (g/L)', 'Citric Acid (g/L)', 'Residual Sugars (g/L)', 'Alcohol Content')
+
+##Use "texreg" function  to generate table
+texreg(list(L1, L2, L3, L4),
+caption = '**Table 4.** Nested Estimates Table for Wine Quality Data with \\emph{texreg}',
+caption.above = TRUE,
+custom.coef.names = wine_names1)
+```
+
+Here is an example of what the output table could look like when knitted to pdf. 
+```{r texreglat, echo=FALSE, out.width = "50%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/texreg_Latex.png")
+```
+
+$~$
+
+That is the end of the LaTex tutorial! Now, we will discuss how to customize your tables even further in the next section, and create interactive tables.
+
+$~$
+
+## Generate customizable tables using the `kableExtra` package
+
+As we learned in the previous day's exercises, the function `kable` from the package `knitr` can be used to create basic tables in R markdown. Now, we are going to be utilizing the package `kableExtra` to create tables that allow for more formatting and styling than just the `kable` function will allow on its own. 
+
+For this part of the tutorial, you will need the following packages loaded from your library:
+
+```{r lbr2, echo=TRUE, warning=FALSE, include=TRUE}
+library(kableExtra)
+library(knitr)
+```
+
+$~$
+
+### CO2 dataset
+
+The dataset that we will be using for the rest of the exercises for the first day is `CO2`. This is a preloaded package in R that can be called up automatically. The data is organized in the following manner: 
+
+1. *Plant*: plant ID assigned by region where they were collected
+2. *Type*: general location plants were collected
+3. *Treatment*: treatment that each plant was assigned
+    + nonchilled
+    + chilled
+4. *conc*: concentration of CO2
+5. *uptake*: total amount of CO2 update by each individual plant
+
+
+```{r CO2str, echo=FALSE, fig.cap="Snapshot of the data structure for the CO2 dataset associated to the second half of chapter 9.", out.width = "50%", fig.align='center', dpi=72}
+knitr::include_graphics("Figures/CO2_structure.png")
+```
+
+$~$
+
+### Basic `kableExtra` table
+
+We are first going to create a table using `kableExtra` that uses the default settings. Copy and paste the following code to run in your R markdown document:
+
+```{r kEt1, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  filter(CO2$Plant == 'Qn1') %>%
+  kable() %>%
+    kable_styling()
+```
+
+From the code above, we are first calling up the dataset that we want to use, `CO2`, and then chaining together the functions after it with `%>%`. 
+
+The following functions in our code chunk, `kable()` and `kable_styling()`, are indicating that the default settings of these will be used in the construction of this table. It is inside of these functions that formatting and styling can be added to make the table more customizabale.
+
+It is possible to filter the data that you want to have displayed in the table as well, especially if you have a very large dataset that doesn't display well in full. We can use the function `filter(CO2$Plant == 'Qn1')` right after the `%>%` from the CO2 dataset. This will filter our data so that only the plants with the region ID `Qn1` will be displayed on the table and exclude everything else. 
+
+Also, the `mutate` function will allow for the values to be rounded to a specified amount. For instance, `mutate(conc = round(conc, 0)` will ensure that the values in the column `conc` are rounded to the whole number. However, `uptake = round(uptake, 1)` will round the values in the column `uptake` to the first decimal place. These types of functions can be used in creating these basic `kableExtra` tables to make the values in the dataset more clean.
+
+We will add these function to the rest of the tables to display how they can be used.
+
+If we compare this table to the one previously made only using the `kable` function, we can see the stark difference between the two. `kableExtra` adds that additional layer of formatting onto the table.
+
+<style>
+td, th {
+  border: 1px solid #dddddd;
+}
+</style>
+
+<table>
+  <caption>**Table 2.** Plant Growth Data</caption>
+  <thead>
+    <tr>
+      <th>ID</th> <th>Group</th> <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td> <td>CTRL</td> <td>4.17</td>
+    </tr>
+    <tr>
+      <td>2</td> <td>CTRL</td> <td>5.58</td>
+    </tr>
+    <tr>
+      <td>3</td> <td>CTRL</td> <td>5.18</td>
+    </tr>
+    <tr>
+      <td>4</td> <td>CTRL</td> <td>6.11</td>
+    </tr>
+  </tbody>
+</table>
+
+
+$~$
+
+### Adding global functions to the `kableExtra` table
+
+We are going to take the same base code chunk from above and begin adding global functions into the `kable()` and `kable_styling()` portions. Copy and paste the following code to run in your R markdown document:
+
+```{r kEt2, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  filter(CO2$Plant == 'Qn1') %>%
+  mutate(conc = round(conc, 0),
+         uptake = round(uptake, 1)) %>%
+  kable(caption = 'Carbon Dioxide Uptake', align = c('l', 'l', 'c', 'r', 'r')) %>%
+    kable_styling(bootstrap_options = c('striped', 'hover', 'responsive', 'condensed'))
+```
+
+The additional global functions added can be seen to already have made the table formatted and styled differently than before. The first addition was to add a table caption by using `caption = 'Carbon Dioxide Uptake'` to the `kable()` function. This will automatically place the table caption at the top of the table output by default. After this, `align = c('l', 'l', 'c', 'r', 'r')` will set how the columns should be aligned, either left ("l"), center ("c"), or right ("r"). 
+
+The `kable_styling()` global functions added are the `bootstrap_options = c('striped', 'hover', 'responsive', 'condensed')`. These bootstrap options enable different features on the table. `striped` makes it so that every second row is a different color, making the table appear striped. `hover` allows for the row that the mouse is hovering over to be highlighted. `responsive` will make the table scroll-able if it is on a small screen or zoomed in. And `condensed` will slightly reduce the row height so that more data can fit on a screen. 
+
+$~$
+
+### Additional global functions and table additions
+
+There are many more global functions that can be added in order to further customize the formatting and style of the table as desired. Below are some examples of global functions:
+
+`full_width=TRUE`: This function is the default setting for tables with kableExtra. It sets the table settings so that the table will expand to the full width of the screen/page it is being viewed on. If you want to adjust the table settings to make it so that it has a fixed size and does not adjust, then the function can be set to "FALSE" (`full_width=FALSE`). This is especially useful if the table has a small number of columns.
+
+`position="left"`: This function will allow the table to be set at a specified alignment on the page, either "left", "right", or "center". This can also have the additional of `float_right` or other such variations. This will make the table appear to "float" within the text surrounding it.
+
+`fixed_thread=TRUE`: If a table is fairly large and has to be scrolled through in order to see it all, then the function "fixed_thread" can be very helpful. This will enable the table headers to be viewable as you are scrolling through a large table. 
+
+`font_size = #`: This function can change the font size output in the tables to a specified value. 
+
+**Alternative themes**: You can further customize the tables by indicating specific themes. These 6 themes include:  
+
+- `kable_paper`
+- `kable_classic`
+- `kable_classic_2`
+- `kable_minimal`
+- `kable_material`
+- `kable_material_dark`
+
+An example of how these would be used in the code for the table would be as follows: 
+
+```{r kEt3, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  filter(CO2$Plant == 'Qn1') %>%
+  mutate(conc = round(conc, 0),
+         uptake = round(uptake, 1)) %>%
+  kable() %>%
+    kable_material_dark()
+```
+
+$~$
+
+### `column_spec()` function
+
+To further add customization formatting and styling to tables, the function `column_spec()` can be used. This function will allow for additional features to be added to specified columns in the table. Copy and paste the following code to run in your R markdown document: 
+
+```{r kEt4, results='asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  filter(CO2$Plant == 'Qn1') %>%
+  mutate(conc = round(conc, 0),
+         uptake = round(uptake, 1)) %>%
+  kable(caption = 'Carbon Dioxide Uptake', align = c('l', 'l', 'c', 'r', 'r')) %>%
+    kable_styling(bootstrap_options = c('striped', 'hover', 'responsive', 'condensed')) %>%
+  column_spec(1, width = "3cm", border_right = TRUE, bold = TRUE, background = "grey") %>%
+  column_spec(3, width = "5cm", border_left = TRUE, bold = TRUE, background = "blue")
+```
+
+The additional coding allows for the first column, designated by the "1" inside the `column_spec` function, to be modified. `width = "3cm"` will set the column's width. This can be adjusted as needed as well depending on the column's content length or personal preference. 
+
+`border_right = TRUE` will place a border on the right side of the designated column. This makes it so that there is a clearer distinction between the columns. 
+
+The different colorations added to this column are done by `bold = TRUE`, which makes all the text content within that column bolded, and `background = "grey"`, which creates a grey background as it implies. These arguments can be changed as well with different background colors or formatting to the text.
+
+These same arguments can also be used when using a function called `row_spec()`, which is essentially the same thing as `column_spec()` except specifically adding modifications to specified rows instead. 
+
+$~$
+
+### `cell_spec()` function
+
+We can take this one step further and use the function `cell_spec()`. This function will allow for additional features to be added to specified cells in the table. Copy and paste the following code to run in your R markdown document: 
+
+```{r kEt5, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  filter(CO2$Plant == 'Qn1') %>%
+  mutate(conc = round(conc, 0),
+         uptake = round(uptake, 1)) %>%
+  mutate(
+    conc = cell_spec(conc, "html",
+                     color = ifelse(conc > 500, "red", "blue"),
+                     font_size = spec_font_size(conc)),
+    uptake = ifelse(uptake > 35,
+                    cell_spec(uptake, "html", color = "red", bold = T), 
+                    ifelse(uptake < 20, 
+                           cell_spec(uptake, "html", color = "blue", bold = T), 
+                           cell_spec(uptake, "html", color = "green", italic = T)))) %>%
+  kable(escape=FALSE, caption = 'Carbon Dioxide Uptake', align = c('l', 'l', 'c', 'r', 'r')) %>%
+    kable_styling(bootstrap_options = c('striped', 'hover', 'responsive', 'condensed')) %>%
+  column_spec(1, width = "3cm", border_right = TRUE, bold = TRUE, background = "grey")
+```
+
+As you can see, the code got *a lot* more complicated. Let's break it down for what was added and what it does to the table output. 
+
+`conc = cell_spec(conc, "html", color = ifelse(conc > 500, "red", "blue"),font_size = spec_font_size(conc))` part of the code is focusing on the column for "conc", or concentration. The "html" portion is simply indicating that the output for these changes will be in html format. Then, a conditional color on the values for "conc" is set using the `ifelse` portion. This essentially states that any value in this column above the indicated value of 500 will be red and values then below 500 will be blue. The `font_size = spec_font_size` portion of the code will then adjust the size of the text based on the size of the values, making larger values have a larger font size and the smaller values a smaller font size. A similar function to this can also be added that adjusts the color of the text based on the values in the column. This code is `color = spec_color()` and will adjust the colors to the text through a gradient.
+
+`uptake = ifelse(uptake > 35, cell_spec(uptake, "html", color = "red", bold = T), ifelse(uptake < 20, cell_spec(uptake, "html", color = "blue", bold = T), cell_spec(uptake, "html", color = "green", italic = T))))` part of the code has some similarities in the one described above and some differences and is focusing on the column for "uptake". It begins with an `ifelse` statement that still sets a conditional color for the values in the column. How it is being specified here is that values above 35 will be colored red and bolded (`bold = T`). Then, one more step to the coloration is taken with the other `ifelse` addition to the code. This section makes it so that any value below 20 in the column is colored blue as well as bolded and that all other values between the ones already specified will be colored green and italicized. 
+
+$~$
+
+### Grouping data
+
+Lastly for the `kableExtra` package, we can group and filter our data for a different way of organizing it in our tables. This will allow certain factors to be grouped differently. In order to execute this portion, we first need to filter our data and then create groups from the data. Copy and paste the following code to run in your R markdown document: 
+
+```{r kEt6, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+pos_groups <- CO2
+
+pos_groups <- table(pos_groups$`Type`)
+```
+
+What we are doing here first is indicating that we are going to be using the `CO2` data in our groupings. A filtering option could be added to this first line of code in order to further define the groupings. 
+
+Then, we can create a count of the different factor levels within the "Type" column. This means that we want to have the table grouped by the two different "Types" of "Quebec" or "Mississippi". 
+
+Now we can run the code for the table with two new additions. Copy and paste the following code to run in your R markdown document:
+
+```{r kEt7, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+CO2 %>%
+  select(-`Type`) %>%
+  mutate(conc = round(conc, 0),
+         uptake = round(uptake, 1)) %>%
+  mutate(
+    conc = cell_spec(conc, "html",
+                     color = ifelse(conc > 500, "red", "blue"),
+                     font_size = spec_font_size(conc)),
+    uptake = ifelse(uptake > 35,
+                    cell_spec(uptake, "html", color = "red", bold = T), 
+                    ifelse(uptake < 20, 
+                           cell_spec(uptake, "html", color = "blue", bold = T), 
+                           cell_spec(uptake, "html", color = "green", italic = T)))) %>%
+  kable(escape=FALSE, caption = 'Carbon Dioxide Uptake', align = c('l', 'l', 'c', 'r', 'r')) %>%
+    kable_styling(bootstrap_options = c('striped', 'hover', 'responsive', 'condensed')) %>%
+  column_spec(1, width = "3cm", border_right = TRUE, bold = TRUE, background = "grey") %>%
+  pack_rows(index = setNames(pos_groups, names(pos_groups)),
+            label_row_css = "background-color: #666; color: #fff;")
+```
+
+The first change we've done here is omit the beginning filtering option that was present on the previous tables. This can still be a feature that is added in other tables, but we don't include it this time around to show the whole results. 
+
+The code `select(-'Type')` will remove the column "Type". We want to do this because we are wanting to organize our table by "Type, so we don't want a duplicate column for "Type" as well. 
+
+Then, the code `pack_rows(index = setNames(pos_groups, names(pos_groups)), label_row_css = "background-color: #666; color: #fff;")` added to the end of the table code will call back the groupings that we made previously. This will split the table up by type for either "Quebec" or "Mississippi". We are also adding features to the color for these rows by giving a specified background and text color.
+
+
+For even more formatting options using the `kableExtra` package, you can follow this link: https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+
+$~$
+
+## Generate interactive tables using the `DT` package
+
+We've learned how to organize, format, and style tables to make them more customizable. Now, we can move onto interactive tables that can be manipulated directly using the `DT` package. This will allow us to interact with the tables after they have been knit to html format. 
+
+For this part of the tutorial, you will need the following package loaded from your library:
+
+```{r lbr3, echo=TRUE, warning=FALSE, include=TRUE}
+library(DT)
+```
+
+$~$
+
+### Basic `DT` table
+
+We are first going to create a table using `DT` that uses the default settings and provides us with some basic options for interaction. Copy and paste the following code to run in your R markdown document:
+
+```{r DT1, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+DT::datatable(CO2)
+```
+
+From this table that is generated, we can see many elements that we can interact with for the simple default settings. There is now a drop down option at the very top of the table output for how many entries we want to see at one time, a search box, organizational arrows for each column, and page number buttons on the bottom of the table. 
+
+The data in this table can be organized immediately. If you type in "Qn3" into the search box, it will bring up all entries that contain "Qn3" and provide you will the entry number/ID as well so that it can be found in the dataset. 
+
+$~$
+
+### `DT` arguments
+
+There are many arguments that can be added to the base `DT::datatable()` function to add additional options and customization. We'll go through these arguments and examples of what the table outputs would be. 
+
+$~$
+
+#### Styling
+
+Just as with the previous types of tables we have covered, `DT` tables can also have the style of the table adjusted. This can be done using the following code: 
+
+```{r DT2, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, class = 'compact hover')
+```
+
+This coding will make the table output "compact", or reduce the amount of white-space in the table. The "hover" addition will also enable highlighting or rows when they are moused over. 
+
+For other styling options, see https://datatables.net/manual/styling/classes
+
+$~$
+
+#### Rows and column options
+
+For the default of DT tables, the row names (numbers) are displayed. You can add a simple argument that will make it so that the row names are not displayed: 
+
+```{r DT3, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, rownames = FALSE)
+```
+
+Alternatively, you can also change the row names to rename them:
+
+```{r DT4, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, rownames = head(LETTERS))
+```
+
+The same can be done for column naming by creating custom names for all columns:
+
+```{r DT5, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, colnames = c('Here', 'Are', 'Some', 'New', 'Names'))
+```
+
+Alternatively, if you only want to replace a specific column name, the code would be as follows:
+
+```{r DT6, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, colnames = c('Totes Chill' = 'Treatment'))
+```
+
+Or, you can specify the columns you want to change the name of by column number: 
+
+```{r DT7, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, colnames = c('ID' = 1, 'Totes Chill' = 4, 'Updog' = 6))
+```
+
+Another option available for columns is column filters. The added argument will make it so that each column will have a filter option along with the general search option. 
+
+```{r DT8, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(CO2, filter = 'top', options = list(
+  pageLenth = 10, autoWidth = TRUE
+))
+```
+
+$~$
+
+#### Table container options
+
+The argument `container` in the `DT` package allows for additions to the table, such as a custom header and footer:
+
+```{r DT9, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+sketch = htmltools::withTags(table(
+  tableHeader(CO2),
+  tableFooter(CO2)
+))
+
+datatable(
+  CO2, 
+  container = sketch, options = list(pageLength = 10, dom = 'tip'), rownames = FALSE
+)
+```
+
+This a footer that contains the column names at the end of the table too. 
+
+$~$
+
+#### Table caption
+
+The `caption` argument can add a table caption with different stylizing options available as well. For instance, see the following code: 
+
+```{r DT10, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+datatable(
+  CO2,
+  caption = htmltools::tags$caption(
+    style = 'caption-side: bottom; text-align: center;',
+    'Table #: ', htmltools::em('This is the table caption. Yes, it is incredible.')
+  )
+)
+```
+
+From this code, we are are specifying the style of the caption by using `caption-side: bottom;`, indicating the caption should be placed on the bottom of the table, and `text-align: center;`, saying the caption will be centered. Furthermore, the content of the table caption is provided on the last line. In particular here, the `htmltools::em()` portion is saying that the portion of the caption  within the parentheses will be italicized. 
+
+$~$
+
+#### Table editing
+
+The `DT` package also has arguments that allows for tables to be edited as well, either by the entire table or even simply by specified cells. 
+
+If you only want to allow for individual cells to be edited, then the code will look like this: 
+
+```{r DT11, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+DT::datatable(CO2, editable = 'cell')
+```
+
+For the table that is produced, you can now double-click on the contents of a cell and will be able to edit the content. Once you either hit enter or click away from the cell, the table will accept the changes made. 
+
+If you only want certain rows or columns to be editable, then you can specify that with the following code: 
+
+```{r DT12, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+DT::datatable(CO2, editable = list(
+  target = 'row', disable = list(columns = c(1, 3, 4))
+))
+```
+
+The code for this table indicates that the "rows" will be highlighted and edited together. If you double click onto any cell, the entire row will be highlighted. You will also notice that only certain cells in that row are able to be edited currently with the others being grayed out. This feature was done from the `disable = list(columns = c(1, 3, 4))` code, which disables the editable feature to the specified columns. 
+
+Since these tables are capable of edits, you would want to make sure that the changes that have been made to them are saved. In order to do this, the `shiny` package will be utilized in order to create a server. The process for this can be found from the following link: https://rstudio.github.io/DT/server.html
+
+$~$
+
+#### Buttons
+
+Different types of buttons can be added onto the `DT` tables that have different functions. 
+
+```{r DT13, results = 'asis', echo=TRUE, warning=FALSE, include=TRUE}
+DT::datatable(CO2, class = 'cell-border stripe', rownames = F, filter = 'top',
+              editable = TRUE, extensions = 'Buttons', options = list(
+        dom = 'Bfrtip',
+        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+       ))
+```
+
+This produces buttons for Copy, CSV, Excel, PDF, and Print. This is especially useful if you are trying to edit a table and want to make sure that you can export the current copy of the table with the edits. 
+
+$~$
+
+# References
+
+<div id="refs"></div>
+
+# (APPENDIX) Appendix {-}
+
+# Appendix 1
+
+Citations of all R packages used to generate this report. 
+
+
+```{r generateBibliography, results="asis", echo=FALSE, warning = FALSE, message=FALSE}
+library("knitcitations")
+cleanbib()
+options("citation_format" = "pandoc")
+read.bibtex(file = "packages_chapter_9.bib")
+``` 
+
+# Appendix 2
+
+Version information about R, the operating system (OS) and attached or R loaded packages. This appendix was generated using `sessionInfo()`.
+
+```{r eval=T, echo=F, warning = FALSE, message=FALSE}
+sessionInfo()
+```
